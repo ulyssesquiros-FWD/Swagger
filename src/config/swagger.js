@@ -23,6 +23,10 @@ const swaggerDefinition = {
     {
       name: 'IA',
       description: 'Interacciones con Claude AI vía Anthropic SDK'
+    },
+    {
+      name: 'Documentación',
+      description: 'Recursos interactivos y especificaciones de la API'
     }
   ],
   components: {

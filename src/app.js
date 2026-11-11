@@ -10,7 +10,18 @@ const app = express();
 // Middleware para procesar cuerpos JSON
 app.use(express.json());
 
-// Documentación interactiva con Swagger UI
+/**
+ * @openapi
+ * /api-docs:
+ *   get:
+ *     summary: Documentación interactiva Swagger UI
+ *     description: Portal web interactivo generado a partir de la especificación OpenAPI 3.0.0.
+ *     tags:
+ *       - Documentación
+ *     responses:
+ *       200:
+ *         description: Interfaz visual de Swagger UI servida correctamente.
+ */
 app.use(
   '/api-docs',
   swaggerUi.serve,
