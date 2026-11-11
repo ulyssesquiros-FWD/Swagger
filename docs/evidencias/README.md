@@ -1,9 +1,9 @@
-# Evidencias de Ejecución y Pruebas — Laboratorio #5
+# Evidencias de Ejecución y Pruebas — Laboratorio #5 (DeepSeek AI)
 
 **Modalidad:** Individual  
 **Estudiante:** `[Nombre y Apellidos del Estudiante]`  
 **Asignatura / Curso:** Desarrollo Backend  
-**Proyecto:** API REST con Express 5, Swagger e integración con Claude API (`lab5-api`)
+**Proyecto:** API REST con Express 5, Swagger e integración con DeepSeek AI (`lab5-api`)
 
 ---
 
@@ -12,16 +12,16 @@
 Este documento contiene la plantilla y el listado ordenado de capturas de pantalla requeridas para la sustentación y entrega del laboratorio.
 
 > **Nota de Seguridad y Honestidad Académica:**  
-> - En ninguna captura de pantalla debe visualizarse la API key de Anthropic.
-> - Si tomas capturas del archivo `.env`, asegúrate de que el valor de `ANTHROPIC_API_KEY` esté censurado o toma la captura de `.env.example`.
-> - Las capturas marcadas como *requiere credenciales reales de Claude* se completan cuando ingreses tu clave en `.env`.
+> - En ninguna captura de pantalla debe visualizarse la API key de DeepSeek.
+> - Si tomas capturas del archivo `.env`, asegúrate de que el valor de `DEEPSEEK_API_KEY` esté censurado o toma la captura de `.env.example`.
+> - Las capturas marcadas como *requiere credenciales reales de DeepSeek* se completan cuando ingreses tu clave en `.env`.
 
 ---
 
 ## Lista de Capturas de Pantalla
 
 ### 1. Estructura del Proyecto
-*Captura del explorador de archivos en el editor de código mostrando la estructura completa de carpetas y archivos de `lab5-api`.*
+*Captura del explorador de archivos en el editor de código mostrando la estructura completa de carpetas y archivos de `lab5-api` con `deepseek.service.js`.*
 
 ```markdown
 ![Estructura del Proyecto](./capturas/01_estructura_proyecto.png)
@@ -31,7 +31,7 @@ Este documento contiene la plantilla y el listado ordenado de capturas de pantal
 ---
 
 ### 2. Servidor Funcionando en Consola
-*Captura de la terminal ejecutando `npm run dev` o `npm start`, mostrando el banner de inicialización, puerto 3000 y URL de Swagger.*
+*Captura de la terminal ejecutando `npm run dev` o `npm start`, mostrando el banner de inicialización, puerto 3000, modelo `deepseek-flash` y URL de Swagger.*
 
 ```markdown
 ![Servidor Funcionando](./capturas/02_servidor_funcionando.png)
@@ -40,7 +40,7 @@ Este documento contiene la plantilla y el listado ordenado de capturas de pantal
 ---
 
 ### 3. Swagger UI Mostrando los Endpoints
-*Captura del navegador web en `http://localhost:3000/api-docs` mostrando la interfaz interactiva con los tags **Notas** e **IA** y los seis endpoints documentados.*
+*Captura del navegador web en `http://localhost:3000/api-docs` mostrando el título "Laboratorio 5: API REST con Express, Swagger y DeepSeek AI", los tags **Notas**, **IA** y **Documentación**, y todos los endpoints documentados.*
 
 ```markdown
 ![Swagger UI General](./capturas/03_swagger_ui_endpoints.png)
@@ -84,35 +84,35 @@ Este documento contiene la plantilla y el listado ordenado de capturas de pantal
 
 ---
 
-### 8. Pregunta Real a Claude AI (POST /api/ia/preguntar)
-*Captura de la petición enviando una pregunta técnica válida (ej. "¿Qué es REST?") a Claude.*
+### 8. Pregunta Real a DeepSeek AI (POST /api/ia/preguntar)
+*Captura de la petición enviando una pregunta técnica válida (ej. "¿Qué es REST?") a DeepSeek.*
 
 ```markdown
-![Petición a Claude](./capturas/08_pregunta_claude_request.png)
+![Petición a DeepSeek](./capturas/08_pregunta_deepseek_request.png)
 ```
 
 ---
 
-### 9. Respuesta de Claude con Tokens (HTTP 200 OK)
-*Captura de la respuesta HTTP 200 recibida, mostrando la propiedad `respuesta` generada y el desglose de tokens en `uso.input_tokens` y `uso.output_tokens`.*
+### 9. Respuesta de DeepSeek con Tokens (HTTP 200 OK)
+*Captura de la respuesta HTTP 200 recibida, mostrando la propiedad `respuesta` generada y el desglose de tokens en `uso.input_tokens`, `uso.output_tokens` y `uso.total_tokens`.*
 
 ```markdown
-![Respuesta Claude Tokens](./capturas/09_respuesta_claude_tokens_200.png)
+![Respuesta DeepSeek Tokens](./capturas/09_respuesta_deepseek_tokens_200.png)
 ```
 
 ---
 
-### 10. Resumen Real de Nota Generado con IA (POST /api/notas/:id/resumen)
+### 10. Resumen Real de Nota Generado con DeepSeek (POST /api/notas/:id/resumen)
 *Captura ejecutando la generación de resumen en 3 viñetas para una nota existente, mostrando el `notaId` y el campo `resumen`.*
 
 ```markdown
-![Resumen Nota Claude](./capturas/10_resumen_nota_ia_200.png)
+![Resumen Nota DeepSeek](./capturas/10_resumen_nota_ia_200.png)
 ```
 
 ---
 
 ### 11. Error 502 Bad Gateway con API Key Inválida
-*Captura configurando temporalmente `ANTHROPIC_API_KEY=sk-ant-invalida-prueba` en `.env` y enviando una pregunta a Claude, demostrando que la API responde con HTTP 502 y cuerpo `{ "error": "IA_NO_DISPONIBLE" }`, mientras el backend registra el 401 de forma segura sin detenerse.*
+*Captura configurando temporalmente `DEEPSEEK_API_KEY=sk-invalida-prueba` en `.env` y enviando una pregunta a DeepSeek, demostrando que la API responde con HTTP 502 y cuerpo `{ "error": "IA_NO_DISPONIBLE", "mensaje": "..." }`, mientras el backend registra el 401 de forma segura sin detenerse.*
 
 ```markdown
 ![Error 502 API Key Inválida](./capturas/11_error_502_api_key_falsa.png)
@@ -130,7 +130,7 @@ Este documento contiene la plantilla y el listado ordenado de capturas de pantal
 ---
 
 ### 13. Pruebas Automatizadas Exitosas
-*Captura de la terminal ejecutando `npm test`, mostrando las 21 pruebas pasando (100% pass) con el ejecutor nativo de Node.js y Supertest.*
+*Captura de la terminal ejecutando `npm test`, mostrando las 21 pruebas pasando (100% pass) con el ejecutor nativo de Node.js y Supertest sobre DeepSeek.*
 
 ```markdown
 ![Pruebas Automatizadas](./capturas/13_pruebas_npm_test.png)
@@ -148,7 +148,7 @@ Este documento contiene la plantilla y el listado ordenado de capturas de pantal
 ---
 
 ### 15. Historial de Commits del Proyecto
-*Captura de la terminal ejecutando `git log --oneline --graph` mostrando el flujo de desarrollo individual progresivo (ramas `feature/lab5` y `main`).*
+*Captura de la terminal ejecutando `git log --oneline --graph` mostrando el flujo de desarrollo individual progresivo y el commit de migración a DeepSeek.*
 
 ```markdown
 ![Historial Git Commits](./capturas/15_git_log_commits.png)

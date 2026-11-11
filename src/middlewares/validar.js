@@ -1,7 +1,7 @@
 /**
  * Middleware para validar el cuerpo de las peticiones (req.body) usando esquemas Zod.
  * En caso de error, responde inmediatamente con HTTP 400 y el listado de fallos,
- * evitando llamadas innecesarias a la lógica de negocio o servicios externos (como Claude).
+ * evitando llamadas innecesarias a la lógica de negocio o servicios externos (como DeepSeek).
  *
  * @param {import('zod').ZodSchema} schema - Esquema de validación Zod
  */

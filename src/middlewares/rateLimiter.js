@@ -2,7 +2,7 @@ const rateLimit = require('express-rate-limit');
 
 /**
  * Middleware de límite de peticiones (Rate Limiter) exclusivo para los endpoints de IA.
- * Protege la API de abusos, evita sobrecostos innecesarios en la API de Claude
+ * Protege la API de abusos, evita sobrecostos innecesarios en la API de DeepSeek
  * y garantiza que el CRUD de notas permanezca 100% operativo independientemente.
  */
 const iaRateLimiter = rateLimit({

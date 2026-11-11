@@ -1,49 +1,62 @@
-const Anthropic = require('@anthropic-ai/sdk');
+const OpenAI = require('openai');
 const { AppError } = require('../utils/errors');
 
 /**
  * Middleware centralizado de gestión de errores.
- * Captura y transforma errores del SDK de Anthropic, errores operacionales (AppError)
+ * Captura y transforma errores del SDK compatible con DeepSeek, errores operacionales (AppError)
  * y excepciones no controladas, protegiendo credenciales y datos sensibles.
  */
 const errorHandler = (err, req, res, next) => {
-  // 1. Identificar si es un error proveniente del SDK de Anthropic o falta de credenciales
-  const esErrorAnthropic =
-    err instanceof Anthropic.APIError ||
+  // 1. Identificar si es un error proveniente de la API de DeepSeek o falta de credenciales
+  const esErrorIA =
+    err instanceof OpenAI.APIError ||
     err.isMissingKey ||
     err.name === 'APIError' ||
     err.name === 'AuthenticationError' ||
+    err.name === 'PermissionDeniedError' ||
+    err.name === 'BadRequestError' ||
     err.name === 'RateLimitError' ||
+    err.name === 'InternalServerError' ||
     err.name === 'APIConnectionError' ||
-    err.name === 'InternalServerError';
+    err.name === 'APIConnectionTimeoutError';
 
-  if (esErrorAnthropic) {
-    const statusOriginal = err.status || 500;
+  if (esErrorIA) {
+    const statusOriginal =
+      err.status ||
+      (err.name === 'APIConnectionError' || err.name === 'APIConnectionTimeoutError'
+        ? 503
+        : 500);
 
-    // Registro técnico seguro en consola del servidor (sin exponer llaves ni encabezados)
+    // Registro técnico seguro en consola del servidor (sin exponer llaves, tokens ni encabezados)
     console.error(
-      `[Anthropic SDK Error] Código detectado: ${statusOriginal} | Nombre: ${err.name || 'APIError'}`
+      `[DeepSeek API Error] Código detectado: ${statusOriginal} | Nombre: ${err.name || 'APIError'}`
     );
 
-    // Mapeo según la guía del laboratorio:
-    // 429 -> 429
-    if (statusOriginal === 429) {
-      return res.status(429).json({
-        error: 'IA_NO_DISPONIBLE'
-      });
+    const cuerpoRespuesta = {
+      error: 'IA_NO_DISPONIBLE',
+      mensaje: 'El servicio de inteligencia artificial no está disponible actualmente.'
+    };
+
+    // Mapeo según especificación:
+    // 429 del proveedor -> nuestra API devuelve 429
+    if (statusOriginal === 429 || err.name === 'RateLimitError') {
+      return res.status(429).json(cuerpoRespuesta);
     }
 
-    // 529 -> 503
-    if (statusOriginal === 529) {
-      return res.status(503).json({
-        error: 'IA_NO_DISPONIBLE'
-      });
+    // 500, 502, 503, 504 o errores de conexión/timeout -> devolver 503
+    if (
+      statusOriginal === 500 ||
+      statusOriginal === 502 ||
+      statusOriginal === 503 ||
+      statusOriginal === 504 ||
+      err.name === 'APIConnectionError' ||
+      err.name === 'APIConnectionTimeoutError'
+    ) {
+      return res.status(503).json(cuerpoRespuesta);
     }
 
-    // 401, 400 y otros -> 502 Bad Gateway
-    return res.status(502).json({
-      error: 'IA_NO_DISPONIBLE'
-    });
+    // 401, 403, 400 y otros errores del proveedor -> devolver 502 Bad Gateway
+    return res.status(502).json(cuerpoRespuesta);
   }
 
   // 2. Errores operacionales controlados mediante AppError

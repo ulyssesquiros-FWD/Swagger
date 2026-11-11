@@ -3,30 +3,31 @@ const assert = require('node:assert/strict');
 const request = require('supertest');
 const app = require('../src/app');
 const notasService = require('../src/services/notas.service');
-const claudeService = require('../src/services/claude.service');
+const deepseekService = require('../src/services/deepseek.service');
 
 // Guardar referencia original del método preguntar para restaurarla al finalizar
-const originalPreguntar = claudeService.preguntar;
+const originalPreguntar = deepseekService.preguntar;
 
-describe('Suite de Pruebas Automatizadas - Lab 5 (API REST + IA)', () => {
-  let llamadasClaude = [];
+describe('Suite de Pruebas Automatizadas - Lab 5 (API REST + DeepSeek AI)', () => {
+  let llamadasDeepSeek = [];
 
   beforeEach(() => {
     // Reiniciar almacenamiento de notas para garantizar aislamiento de pruebas
     notasService.reiniciar();
 
-    // Reiniciar registro de llamadas a Claude
-    llamadasClaude = [];
+    // Reiniciar registro de llamadas a DeepSeek
+    llamadasDeepSeek = [];
 
-    // Mock por defecto de Claude Service para evitar consumo de créditos reales
-    claudeService.preguntar = async (texto, system) => {
-      llamadasClaude.push({ texto, system });
+    // Mock por defecto de DeepSeek Service para evitar consumo de créditos reales
+    deepseekService.preguntar = async (texto, system, opciones) => {
+      llamadasDeepSeek.push({ texto, system, opciones });
       return {
         respuesta:
           '- Primera idea sintetizada.\n- Segunda idea sintetizada.\n- Tercera idea sintetizada.',
         uso: {
-          input_tokens: 22,
-          output_tokens: 65
+          input_tokens: 35,
+          output_tokens: 90,
+          total_tokens: 125
         }
       };
     };
@@ -34,7 +35,7 @@ describe('Suite de Pruebas Automatizadas - Lab 5 (API REST + IA)', () => {
 
   after(() => {
     // Restaurar implementación original
-    claudeService.preguntar = originalPreguntar;
+    deepseekService.preguntar = originalPreguntar;
   });
 
   describe('1. CRUD de Notas en memoria', () => {
@@ -176,11 +177,12 @@ describe('Suite de Pruebas Automatizadas - Lab 5 (API REST + IA)', () => {
       assert.ok(res.body.respuesta);
       assert.equal(typeof res.body.uso.input_tokens, 'number');
       assert.equal(typeof res.body.uso.output_tokens, 'number');
-      assert.equal(llamadasClaude.length, 1);
-      assert.equal(llamadasClaude[0].texto, '¿Qué es Express.js?');
+      assert.equal(typeof res.body.uso.total_tokens, 'number');
+      assert.equal(llamadasDeepSeek.length, 1);
+      assert.equal(llamadasDeepSeek[0].texto, '¿Qué es Express.js?');
     });
 
-    it('Debe rechazar una pregunta de 1 solo carácter (HTTP 400) y NO llamar a Claude', async () => {
+    it('Debe rechazar una pregunta de 1 solo carácter (HTTP 400) y NO llamar a DeepSeek', async () => {
       const res = await request(app)
         .post('/api/ia/preguntar')
         .send({ pregunta: 'a' });
@@ -188,15 +190,15 @@ describe('Suite de Pruebas Automatizadas - Lab 5 (API REST + IA)', () => {
       assert.equal(res.status, 400);
       assert.ok(Array.isArray(res.body.errores));
       assert.ok(res.body.errores.some((e) => e.path.includes('pregunta')));
-      // Verificación crítica: Claude no fue invocado
-      assert.equal(llamadasClaude.length, 0);
+      // Verificación crítica: DeepSeek no fue invocado
+      assert.equal(llamadasDeepSeek.length, 0);
     });
 
-    it('Debe rechazar una petición sin campo "pregunta" y NO llamar a Claude', async () => {
+    it('Debe rechazar una petición sin campo "pregunta" y NO llamar a DeepSeek', async () => {
       const res = await request(app).post('/api/ia/preguntar').send({});
 
       assert.equal(res.status, 400);
-      assert.equal(llamadasClaude.length, 0);
+      assert.equal(llamadasDeepSeek.length, 0);
     });
   });
 
@@ -215,26 +217,27 @@ describe('Suite de Pruebas Automatizadas - Lab 5 (API REST + IA)', () => {
       assert.equal(res.status, 200);
       assert.equal(res.body.notaId, notaCreada.body.id);
       assert.ok(res.body.resumen);
-      assert.equal(llamadasClaude.length, 1);
-      assert.equal(llamadasClaude[0].texto, notaCreada.body.contenido);
-      assert.ok(llamadasClaude[0].system.includes('3 viñetas'));
+      assert.equal(llamadasDeepSeek.length, 1);
+      assert.equal(llamadasDeepSeek[0].texto, notaCreada.body.contenido);
+      assert.ok(llamadasDeepSeek[0].system.includes('3 viñetas'));
+      assert.equal(llamadasDeepSeek[0].opciones?.max_tokens, 256);
     });
 
-    it('Debe responder 404 al intentar resumir una nota inexistente y NO llamar a Claude', async () => {
+    it('Debe responder 404 al intentar resumir una nota inexistente y NO llamar a DeepSeek', async () => {
       const res = await request(app).post('/api/notas/9999/resumen');
 
       assert.equal(res.status, 404);
       assert.ok(res.body.error);
-      // Verificación crítica: Claude NO fue invocado si la nota no existe
-      assert.equal(llamadasClaude.length, 0);
+      // Verificación crítica: DeepSeek NO fue invocado si la nota no existe
+      assert.equal(llamadasDeepSeek.length, 0);
     });
   });
 
-  describe('5. Manejo de Errores del SDK de Anthropic', () => {
-    it('Debe mapear un error 401 de Anthropic (clave inválida o ausente) a HTTP 502 genérico', async () => {
-      // Simular fallo de autenticación de Anthropic
-      claudeService.preguntar = async () => {
-        const err = new Error('Invalid API Key');
+  describe('5. Manejo de Errores de DeepSeek API (OpenAI SDK)', () => {
+    it('Debe mapear un error 401 de DeepSeek (clave inválida o ausente) a HTTP 502 genérico', async () => {
+      // Simular fallo de autenticación de DeepSeek
+      deepseekService.preguntar = async () => {
+        const err = new Error('Incorrect API key provided');
         err.status = 401;
         err.name = 'AuthenticationError';
         throw err;
@@ -242,17 +245,20 @@ describe('Suite de Pruebas Automatizadas - Lab 5 (API REST + IA)', () => {
 
       const res = await request(app)
         .post('/api/ia/preguntar')
-        .send({ pregunta: '¿Hola mundo?' });
+        .send({ pregunta: '¿Hola DeepSeek?' });
 
       assert.equal(res.status, 502);
-      assert.deepEqual(res.body, { error: 'IA_NO_DISPONIBLE' });
+      assert.deepEqual(res.body, {
+        error: 'IA_NO_DISPONIBLE',
+        mensaje: 'El servicio de inteligencia artificial no está disponible actualmente.'
+      });
     });
 
-    it('Debe mapear un error 529 de Anthropic (servicio sobrecargado) a HTTP 503', async () => {
-      claudeService.preguntar = async () => {
-        const err = new Error('Anthropic Overloaded');
-        err.status = 529;
-        err.name = 'APIError';
+    it('Debe mapear un error 503 de DeepSeek (servicio sobrecargado/indisponible) a HTTP 503', async () => {
+      deepseekService.preguntar = async () => {
+        const err = new Error('DeepSeek Service Unavailable');
+        err.status = 503;
+        err.name = 'InternalServerError';
         throw err;
       };
 
@@ -261,20 +267,27 @@ describe('Suite de Pruebas Automatizadas - Lab 5 (API REST + IA)', () => {
         .send({ pregunta: 'Consulta con sobrecarga' });
 
       assert.equal(res.status, 503);
-      assert.deepEqual(res.body, { error: 'IA_NO_DISPONIBLE' });
+      assert.deepEqual(res.body, {
+        error: 'IA_NO_DISPONIBLE',
+        mensaje: 'El servicio de inteligencia artificial no está disponible actualmente.'
+      });
     });
   });
 
   describe('6. Documentación OpenAPI / Swagger', () => {
-    it('Debe exponer la especificación Swagger JSON en /api-docs.json con título correcto', async () => {
+    it('Debe exponer la especificación Swagger JSON en /api-docs.json con título y rutas de DeepSeek', async () => {
       const res = await request(app).get('/api-docs.json');
 
       assert.equal(res.status, 200);
-      assert.equal(res.body.info.title, 'Lab 5: Notas + IA');
+      assert.equal(
+        res.body.info.title,
+        'Laboratorio 5: API REST con Express, Swagger y DeepSeek AI'
+      );
       assert.equal(res.body.info.version, '1.0.0');
       assert.ok(res.body.paths['/api/notas']);
       assert.ok(res.body.paths['/api/ia/preguntar']);
       assert.ok(res.body.paths['/api/notas/{id}/resumen']);
+      assert.ok(res.body.paths['/api-docs']);
     });
   });
 
@@ -285,7 +298,6 @@ describe('Suite de Pruebas Automatizadas - Lab 5 (API REST + IA)', () => {
         .send({ pregunta: '¿Cómo funciona el rate limiting?' });
 
       assert.equal(res.status, 200);
-      // Las cabeceras standardHeaders devuelven ratelimit-limit y ratelimit-remaining
       assert.ok(
         res.headers['ratelimit-limit'] !== undefined ||
         res.headers['ratelimit-remaining'] !== undefined

@@ -1,7 +1,7 @@
 const express = require('express');
 const { z } = require('zod');
 const notasService = require('../services/notas.service');
-const claudeService = require('../services/claude.service');
+const deepseekService = require('../services/deepseek.service');
 const { validar } = require('../middlewares/validar');
 const { iaRateLimiter } = require('../middlewares/rateLimiter');
 
@@ -161,8 +161,8 @@ router.delete('/:id', (req, res) => {
  * @openapi
  * /api/notas/{id}/resumen:
  *   post:
- *     summary: Generar resumen de una nota con Claude AI
- *     description: Recupera el contenido de una nota existente y utiliza la API de Claude para generar un resumen estructurado en 3 viñetas breves.
+ *     summary: Generar resumen de una nota con DeepSeek AI
+ *     description: Recupera el contenido de una nota existente y utiliza la API de DeepSeek (modelo deepseek-flash) para generar un resumen estructurado en exactamente 3 viñetas breves.
  *     tags:
  *       - Notas
  *       - IA
@@ -176,7 +176,7 @@ router.delete('/:id', (req, res) => {
  *           example: 1
  *     responses:
  *       200:
- *         description: Resumen generado exitosamente por Claude AI.
+ *         description: Resumen generado exitosamente por DeepSeek AI.
  *         content:
  *           application/json:
  *             schema:
@@ -185,7 +185,7 @@ router.delete('/:id', (req, res) => {
  *               notaId: 1
  *               resumen: "- Primera idea importante.\n- Segunda idea importante.\n- Tercera idea importante."
  *       404:
- *         description: La nota no existe. No se realiza ninguna llamada a la API de Claude.
+ *         description: La nota no existe. No se realiza ninguna llamada a la API de DeepSeek.
  *         content:
  *           application/json:
  *             schema:
@@ -197,13 +197,13 @@ router.delete('/:id', (req, res) => {
  *             schema:
  *               $ref: '#/components/schemas/ErrorIA'
  *       502:
- *         description: Error de comunicación o credenciales con la API de Claude.
+ *         description: Error de comunicación o credenciales con la API de DeepSeek.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorIA'
  *       503:
- *         description: Servicio de Claude sobrecargado temporalmente.
+ *         description: Servicio de DeepSeek sobrecargado o error de conexión.
  *         content:
  *           application/json:
  *             schema:
@@ -214,11 +214,13 @@ router.post('/:id/resumen', iaRateLimiter, async (req, res, next) => {
     // 1 & 2 & 3. Buscar la nota y verificar que exista (lanza 404 si no existe)
     const nota = notasService.buscar(req.params.id);
 
-    // 4 & 5 & 6. Enviar contenido a Claude con el system prompt especificado
+    // 4 & 5 & 6. Enviar contenido a DeepSeek con el system prompt especificado
     const systemPrompt =
-      'Resume el texto en 3 viñetas breves, claras y concretas, en español. No inventes información que no aparezca en el contenido original.';
+      'Resume el texto en exactamente 3 viñetas breves y concretas, en español. No inventes información. Utiliza únicamente los datos proporcionados y evita explicaciones adicionales.';
 
-    const resultadoIA = await claudeService.preguntar(nota.contenido, systemPrompt);
+    const resultadoIA = await deepseekService.preguntar(nota.contenido, systemPrompt, {
+      max_tokens: 256
+    });
 
     // 7. Devolver el resultado con el formato exacto requerido
     return res.status(200).json({

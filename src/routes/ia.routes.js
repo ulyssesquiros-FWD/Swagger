@@ -1,13 +1,13 @@
 const express = require('express');
 const { z } = require('zod');
-const claudeService = require('../services/claude.service');
+const deepseekService = require('../services/deepseek.service');
 const { validar } = require('../middlewares/validar');
 const { iaRateLimiter } = require('../middlewares/rateLimiter');
 
 const router = express.Router();
 
 /**
- * Esquema de validación para las consultas dirigidas a Claude.
+ * Esquema de validación para las consultas dirigidas a DeepSeek.
  */
 const preguntaSchema = z.object({
   pregunta: z
@@ -23,8 +23,8 @@ const preguntaSchema = z.object({
  * @openapi
  * /api/ia/preguntar:
  *   post:
- *     summary: Enviar una consulta a Claude AI
- *     description: Valida el texto de la pregunta con Zod y la envía al modelo configurado de Claude mediante el SDK oficial de Anthropic.
+ *     summary: Enviar una consulta a DeepSeek AI
+ *     description: Valida el texto de la pregunta con Zod y la envía al modelo deepseek-flash utilizando el SDK OpenAI compatible con DeepSeek.
  *     tags:
  *       - IA
  *     requestBody:
@@ -35,7 +35,7 @@ const preguntaSchema = z.object({
  *             $ref: '#/components/schemas/Pregunta'
  *     responses:
  *       200:
- *         description: Consulta respondida exitosamente por Claude AI.
+ *         description: Consulta respondida exitosamente por DeepSeek AI.
  *         content:
  *           application/json:
  *             schema:
@@ -43,10 +43,11 @@ const preguntaSchema = z.object({
  *             example:
  *               respuesta: "REST es un estilo de arquitectura para sistemas hipermedia distribuidos..."
  *               uso:
- *                 input_tokens: 18
- *                 output_tokens: 142
+ *                 input_tokens: 35
+ *                 output_tokens: 90
+ *                 total_tokens: 125
  *       400:
- *         description: Error de validación en la pregunta. No se realiza ninguna llamada a Claude.
+ *         description: Error de validación en la pregunta. No se realiza ninguna llamada a DeepSeek.
  *         content:
  *           application/json:
  *             schema:
@@ -58,13 +59,13 @@ const preguntaSchema = z.object({
  *             schema:
  *               $ref: '#/components/schemas/ErrorIA'
  *       502:
- *         description: Error de autenticación o comunicación con la API de Claude.
+ *         description: Error de autenticación o comunicación con la API de DeepSeek.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorIA'
  *       503:
- *         description: Servicio de Claude sobrecargado temporalmente.
+ *         description: Servicio de DeepSeek sobrecargado o error de conexión.
  *         content:
  *           application/json:
  *             schema:
@@ -77,7 +78,7 @@ router.post(
   async (req, res, next) => {
     try {
       const { pregunta } = req.body;
-      const resultado = await claudeService.preguntar(pregunta);
+      const resultado = await deepseekService.preguntar(pregunta);
 
       return res.status(200).json(resultado);
     } catch (error) {

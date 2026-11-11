@@ -1,5 +1,5 @@
 /**
- * Script interactivo de demostración y verificación de endpoints para Lab 5.
+ * Script interactivo de demostración y verificación de endpoints para Lab 5 (DeepSeek AI).
  * Permite al estudiante verificar visualmente todas las funcionalidades y capturar evidencias fácilmente.
  *
  * Ejecución:
@@ -25,7 +25,7 @@ const c = {
 
 async function ejecutarDemostracion() {
   console.log(`${c.bright}${c.cyan}==================================================================${c.reset}`);
-  console.log(`${c.bright}${c.cyan}  LABORATORIO #5 — DEMOSTRACIÓN Y VERIFICACIÓN EN VIVO (INDIVIDUAL)${c.reset}`);
+  console.log(`${c.bright}${c.cyan}  LABORATORIO #5 — DEMOSTRACIÓN Y VERIFICACIÓN EN VIVO (DEEPSEEK) ${c.reset}`);
   console.log(`${c.bright}${c.cyan}==================================================================${c.reset}\n`);
 
   const server = app.listen(PORT, async () => {
@@ -97,40 +97,40 @@ async function ejecutarDemostracion() {
       const errInexistente = await resInexistente.json();
       console.log(`   ${c.yellow}✔ HTTP 404 Not Found interceptado:${c.reset}`, errInexistente, '\n');
 
-      // 8. Resumen de nota inexistente (404 sin llamar a Claude)
+      // 8. Resumen de nota inexistente (404 sin llamar a DeepSeek)
       console.log(`${c.bright}8. Resumiendo nota inexistente (POST /api/notas/999/resumen):${c.reset}`);
       const resResumen404 = await fetch(`${baseUrl}/api/notas/999/resumen`, { method: 'POST' });
       const errResumen404 = await resResumen404.json();
-      console.log(`   ${c.yellow}✔ HTTP 404 Not Found (Claude NO fue llamado):${c.reset}`, errResumen404, '\n');
+      console.log(`   ${c.yellow}✔ HTTP 404 Not Found (DeepSeek NO fue llamado):${c.reset}`, errResumen404, '\n');
 
-      // 9. Comprobar integración con Claude (si la clave está presente o explicar cómo configurarla)
-      const apiKey = process.env.ANTHROPIC_API_KEY;
-      if (apiKey && apiKey.startsWith('sk-ant-') && !apiKey.includes('falsa') && !apiKey.includes('tu-clave')) {
-        console.log(`${c.bright}9. Enviando consulta REAL a Claude AI (POST /api/ia/preguntar):${c.reset}`);
+      // 9. Comprobar integración con DeepSeek
+      const apiKey = process.env.DEEPSEEK_API_KEY;
+      if (apiKey && apiKey.startsWith('sk-') && !apiKey.includes('falsa') && !apiKey.includes('tu-clave') && apiKey.trim() !== '') {
+        console.log(`${c.bright}9. Enviando consulta REAL a DeepSeek AI (POST /api/ia/preguntar):${c.reset}`);
         const resIA = await fetch(`${baseUrl}/api/ia/preguntar`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ pregunta: '¿Qué es un middleware en Express en 2 oraciones?' })
         });
         const dataIA = await resIA.json();
-        console.log(`   ${c.green}✔ HTTP 200 OK de Claude:${c.reset}`, dataIA, '\n');
+        console.log(`   ${c.green}✔ HTTP 200 OK de DeepSeek:${c.reset}`, dataIA, '\n');
 
         console.log(`${c.bright}10. Generando resumen REAL de Nota 1 en 3 viñetas (POST /api/notas/1/resumen):${c.reset}`);
         const resResumen = await fetch(`${baseUrl}/api/notas/1/resumen`, { method: 'POST' });
         const dataResumen = await resResumen.json();
-        console.log(`   ${c.green}✔ HTTP 200 OK Resumen generado:${c.reset}`, dataResumen, '\n');
+        console.log(`   ${c.green}✔ HTTP 200 OK Resumen generado por DeepSeek:${c.reset}`, dataResumen, '\n');
       } else {
-        console.log(`${c.yellow}ℹ️ ANTHROPIC_API_KEY no configurada aún en .env.${c.reset}`);
-        console.log(`   Para realizar llamadas reales a Claude, edita ${c.bright}.env${c.reset} y añade tu API key.`);
+        console.log(`${c.yellow}ℹ️ DEEPSEEK_API_KEY no configurada aún en .env.${c.reset}`);
+        console.log(`   Para realizar llamadas reales a DeepSeek, edita ${c.bright}.env${c.reset} y añade tu API key.`);
         console.log(`   Probando manejo de clave ausente/inválida (mapeo a 502 Bad Gateway)...`);
-        process.env.ANTHROPIC_API_KEY = 'sk-ant-api03-simulada-invalida';
+        process.env.DEEPSEEK_API_KEY = 'sk-invalida-prueba';
         const resFalsa = await fetch(`${baseUrl}/api/ia/preguntar`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ pregunta: '¿Qué es REST?' })
         });
         const dataFalsa = await resFalsa.json();
-        console.log(`   ${c.green}✔ Error de Anthropic mapeado con éxito a HTTP ${resFalsa.status}:${c.reset}`, dataFalsa, '\n');
+        console.log(`   ${c.green}✔ Error de DeepSeek mapeado con éxito a HTTP ${resFalsa.status}:${c.reset}`, dataFalsa, '\n');
       }
 
       // 11. Eliminar Nota (204 No Content)

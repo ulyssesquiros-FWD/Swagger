@@ -4,10 +4,10 @@ const path = require('path');
 const swaggerDefinition = {
   openapi: '3.0.0',
   info: {
-    title: 'Lab 5: Notas + IA',
+    title: 'Laboratorio 5: API REST con Express, Swagger y DeepSeek AI',
     version: '1.0.0',
     description:
-      'API REST modular con Express 5 para la gestión de notas e integración directa con inteligencia artificial utilizando el SDK oficial de Anthropic (Claude API). Proyecto desarrollado en modalidad individual.'
+      'API REST modular con Express 5 para la gestión de notas e integración directa con inteligencia artificial utilizando la API de DeepSeek (modelo deepseek-flash) mediante el SDK OpenAI compatible. Proyecto desarrollado en modalidad individual.'
   },
   servers: [
     {
@@ -22,7 +22,7 @@ const swaggerDefinition = {
     },
     {
       name: 'IA',
-      description: 'Interacciones con Claude AI vía Anthropic SDK'
+      description: 'Interacciones con DeepSeek AI (deepseek-flash) vía SDK compatible'
     },
     {
       name: 'Documentación',
@@ -80,7 +80,7 @@ const swaggerDefinition = {
             minLength: 3,
             maxLength: 2000,
             example: '¿Qué es REST?',
-            description: 'Texto de la consulta dirigida a Claude (3 a 2000 caracteres)'
+            description: 'Texto de la consulta dirigida a DeepSeek (3 a 2000 caracteres)'
           }
         },
         required: ['pregunta']
@@ -91,20 +91,25 @@ const swaggerDefinition = {
           respuesta: {
             type: 'string',
             example: 'REST es un estilo de arquitectura...',
-            description: 'Texto de respuesta generado por Claude'
+            description: 'Texto de respuesta generado por DeepSeek'
           },
           uso: {
             type: 'object',
             properties: {
               input_tokens: {
                 type: 'integer',
-                example: 18,
-                description: 'Tokens consumidos por el prompt'
+                example: 35,
+                description: 'Tokens consumidos por el prompt (prompt_tokens)'
               },
               output_tokens: {
                 type: 'integer',
-                example: 142,
-                description: 'Tokens generados en la respuesta'
+                example: 90,
+                description: 'Tokens generados en la respuesta (completion_tokens)'
+              },
+              total_tokens: {
+                type: 'integer',
+                example: 125,
+                description: 'Total de tokens consumidos en la interacción'
               }
             }
           }
@@ -121,7 +126,7 @@ const swaggerDefinition = {
           resumen: {
             type: 'string',
             example: '- Primera idea importante.\n- Segunda idea importante.\n- Tercera idea importante.',
-            description: 'Resumen estructurado en 3 viñetas concretas'
+            description: 'Resumen estructurado en exactamente 3 viñetas concretas generado por DeepSeek'
           }
         }
       },
@@ -155,7 +160,12 @@ const swaggerDefinition = {
           error: {
             type: 'string',
             example: 'IA_NO_DISPONIBLE',
-            description: 'Mensaje genérico seguro que no expone detalles de proveedor'
+            description: 'Identificador genérico de error que no expone detalles del proveedor'
+          },
+          mensaje: {
+            type: 'string',
+            example: 'El servicio de inteligencia artificial no está disponible actualmente.',
+            description: 'Mensaje descriptivo seguro para el usuario'
           }
         }
       },
