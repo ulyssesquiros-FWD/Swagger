@@ -1,7 +1,8 @@
 # Evidencias de Ejecución y Pruebas — Laboratorio #5 (DeepSeek AI)
 
 **Modalidad:** Individual  
-**Estudiante:** `[Nombre y Apellidos del Estudiante]`  
+**Estudiante:** Ulysses Quirós (Josué Varela)  
+**Repositorio GitHub:** [https://github.com/ulyssesquiros-FWD/Swagger](https://github.com/ulyssesquiros-FWD/Swagger)  
 **Asignatura / Curso:** Desarrollo Backend  
 **Proyecto:** API REST con Express 5, Swagger e integración con DeepSeek AI (`lab5-api`)
 

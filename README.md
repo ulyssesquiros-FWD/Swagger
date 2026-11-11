@@ -1,9 +1,9 @@
 # Lab 5: API REST con Express 5, Swagger e Integración con DeepSeek AI
 
 > **Modalidad de Desarrollo:** Individual  
-> **Estudiante:** `[Nombre y Apellidos del Estudiante]`  
+> **Estudiante:** Ulysses Quirós (Josué Varela)  
 > **Curso / Asignatura:** Desarrollo Backend / Arquitectura Web  
-> **Repositorio:** `lab5-api`  
+> **Repositorio GitHub:** [https://github.com/ulyssesquiros-FWD/Swagger](https://github.com/ulyssesquiros-FWD/Swagger)  
 
 ---
 
@@ -38,9 +38,9 @@ Este proyecto ha sido desarrollado bajo modalidad estrictamente **individual**. 
 ---
 
 ## 5. Datos del Estudiante
-- **Nombre del Estudiante:** `[Nombre y Apellidos del Estudiante]`
-- **Código / Matrícula:** `[Código o Matrícula]`
-- **Institución:** `[Universidad / Institución Educativa]`
+- **Nombre del Estudiante:** Ulysses Quirós (Josué Varela)
+- **Repositorio Oficial:** [https://github.com/ulyssesquiros-FWD/Swagger](https://github.com/ulyssesquiros-FWD/Swagger)
+- **Institución:** FWD Costa Rica
 - **Fecha de Entrega:** Noviembre 2026
 
 ---

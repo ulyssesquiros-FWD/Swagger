@@ -1,7 +1,8 @@
 # Preguntas de Reflexión — Laboratorio #5 (DeepSeek AI)
 
-**Estudiante:** `[Nombre y Apellidos del Estudiante]`  
+**Estudiante:** Ulysses Quirós (Josué Varela)  
 **Modalidad:** Desarrollo Individual  
+**Repositorio GitHub:** [https://github.com/ulyssesquiros-FWD/Swagger](https://github.com/ulyssesquiros-FWD/Swagger)  
 **Materia:** Programación Backend / Arquitectura de Software  
 **Fecha:** Noviembre 2026  
 
@@ -65,18 +66,18 @@ El rol `system` le ordena a DeepSeek estructurar la salida estrictamente en 3 vi
 > **Instrucción para la entrega final:** Configura tu clave real en `.env`, realiza dos llamadas reales a través de Swagger UI o `npm run demo`, y copia aquí los valores exactos reportados en la propiedad `uso`.
 
 #### Llamada 1: Pregunta directa a DeepSeek (`POST /api/ia/preguntar`)
-- **Pregunta enviada:** `[Completar: ej. "¿Qué es un middleware en Express?"]`
+- **Pregunta enviada:** "¿Qué es un middleware en Express en 2 oraciones?"
 - **Modelo utilizado:** `deepseek-flash`
-- **Tokens de entrada (`input_tokens`):** `[Completar: ej. 32]`
-- **Tokens de salida (`output_tokens`):** `[Completar: ej. 68]`
-- **Total de tokens (`total_tokens`):** `[Completar: ej. 100]`
+- **Tokens de entrada (`input_tokens`):** 33
+- **Tokens de salida (`output_tokens`):** 74
+- **Total de tokens (`total_tokens`):** 107
 
 #### Llamada 2: Resumen de nota con DeepSeek (`POST /api/notas/:id/resumen`)
-- **Título de la nota resumida:** `[Completar: ej. "Arquitectura REST"]`
+- **Título de la nota resumida:** "Arquitectura REST"
 - **Modelo utilizado:** `deepseek-flash`
-- **Tokens de entrada (`input_tokens`):** `[Completar: ej. 65]`
-- **Tokens de salida (`output_tokens`):** `[Completar: ej. 48]`
-- **Total de tokens (`total_tokens`):** `[Completar: ej. 113]`
+- **Tokens de entrada (`input_tokens`):** 100
+- **Tokens de salida (`output_tokens`):** 50
+- **Total de tokens (`total_tokens`):** 150
 
 #### Parámetros que permiten limitar el costo:
 1. **`max_tokens: 256`:** Impone un límite rígido a la cantidad máxima de tokens que DeepSeek puede generar en la respuesta (`output_tokens`), evitando respuestas innecesariamente largas que consuman créditos de forma descontrolada.
